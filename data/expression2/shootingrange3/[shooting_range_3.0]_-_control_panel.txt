@@ -1,0 +1,108 @@
+#[
+    NickMBR - Jun/2019
+    Shooting Range 3.0
+    https://github.com/NickMBR/ShootingRange3
+]#
+
+@name [Shooting Range 3.0] - Control Panel
+
+# MAIN I/O
+@inputs SCREEN:wirelink USER:entity
+@persist CURSOR:vector2 [PAGE, MODE]:string SCREEN_USER:entity COLORS:table CLEAR_SCREEN:number
+
+runOnTick(66)
+MODE = "DEVELOPMENT"
+
+if (first() | duped()) {
+    SCREEN_USER = noentity()
+    COLORS = table()
+    
+    COLORS["BACKGROUND", vector] = vec(41)
+    COLORS["FOREGROUND", vector] = vec(230)
+    COLORS["PRIMARY", vector] = vec(161, 51, 34)
+    
+    CLEAR_SCREEN = 1
+    
+    if (MODE == "DEVELOPMENT") {
+        SCREEN:egpClear()
+        SCREEN:egpDrawTopLeft(1)
+
+        PAGE = ""
+        timer("BOOT", 500)
+    }
+    
+}
+
+if (dupefinished()) {   
+    SCREEN:egpClear()
+    SCREEN:egpDrawTopLeft(1)
+    
+    PAGE = ""
+    timer("BOOT", 500)
+}
+
+if (clk("BOOT")) {
+    PAGE = "MAIN"
+    stoptimer("BOOT")
+}
+
+# DEFINE THE USER OF THE SCREEN
+if (SCREEN_USER == noentity()) {
+    if (USER:keyUse()){
+        SCREEN_USER = USER
+    }
+}
+
+# DEFINE THE CURSOR OF THE SCREEN USER AND KEEPS UPDATING IT
+CURSOR = SCREEN:egpCursor(SCREEN_USER)
+
+function void clearScreen()
+{
+    SCREEN:egpClear()
+    CLEAR_SCREEN = 0
+}
+
+function void drawPanel() {
+    SCREEN:egpBox(1, vec2(0), vec2(512))
+    SCREEN:egpColor(1, COLORS["BACKGROUND", vector])
+}
+
+function void drawHeader() {
+    SCREEN:egpBox(3, vec2(106, 0), vec2(300, 80))
+    SCREEN:egpColor(3, COLORS["FOREGROUND", vector])
+    
+    SCREEN:egpText(3, "Shooting Range", vec2(256, 25))
+    SCREEN:egpAlign(3, 1)
+    SCREEN:egpSize(3, 70)
+    SCREEN:egpFont(3, "Coolvetica")
+    SCREEN:egpColor(3, COLORS["FOREGROUND", vector])
+    
+    SCREEN:egpText(4, "3.0", vec2(450, 25))
+    SCREEN:egpAlign(4, 1)
+    SCREEN:egpSize(4, 25)
+    SCREEN:egpFont(4, "Coolvetica")
+    SCREEN:egpColor(4, COLORS["FOREGROUND", vector])
+    
+    SCREEN:egpText(5, "by NickMBR", vec2(115, 75))
+    SCREEN:egpAlign(5, 1)
+    SCREEN:egpSize(5, 30)
+    SCREEN:egpFont(5, "Coolvetica")
+    SCREEN:egpColor(5, COLORS["FOREGROUND", vector])
+}
+
+function void drawMainPage() {
+    if (CLEAR_SCREEN == 1) {
+        clearScreen()
+        drawPanel()
+        drawHeader()
+    }
+}
+
+if (changed(PAGE)) {
+    CLEAR_SCREEN = 1
+    
+    if (PAGE == "MAIN") {
+        SCREEN_USER = noentity()
+        drawMainPage()
+    }
+}
