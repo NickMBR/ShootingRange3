@@ -19,7 +19,10 @@ if (first() | duped()) {
     
     COLORS["BACKGROUND", vector] = vec(41)
     COLORS["FOREGROUND", vector] = vec(230)
+    COLORS["GREY1", vector] = vec(100)
+    COLORS["GREY2", vector] = vec(80)
     COLORS["PRIMARY", vector] = vec(161, 51, 34)
+    COLORS["ACCENT", vector] = vec(0, 255, 127)
     
     CLEAR_SCREEN = 1
     
@@ -33,7 +36,7 @@ if (first() | duped()) {
     
 }
 
-if (dupefinished()) {   
+if (dupefinished() && MODE == "PRODUCTION") {
     SCREEN:egpClear()
     SCREEN:egpDrawTopLeft(1)
     
@@ -68,26 +71,23 @@ function void drawPanel() {
 }
 
 function void drawHeader() {
-    SCREEN:egpBox(3, vec2(106, 0), vec2(300, 80))
-    SCREEN:egpColor(3, COLORS["FOREGROUND", vector])
+    SCREEN:egpText(2, "Shooting Range", vec2(256, 25))
+    SCREEN:egpAlign(2, 1)
+    SCREEN:egpSize(2, 70)
+    SCREEN:egpFont(2, "Coolvetica")
+    SCREEN:egpColor(2, COLORS["FOREGROUND", vector])
     
-    SCREEN:egpText(3, "Shooting Range", vec2(256, 25))
+    SCREEN:egpText(3, "3.0", vec2(450, 25))
     SCREEN:egpAlign(3, 1)
-    SCREEN:egpSize(3, 70)
+    SCREEN:egpSize(3, 25)
     SCREEN:egpFont(3, "Coolvetica")
     SCREEN:egpColor(3, COLORS["FOREGROUND", vector])
     
-    SCREEN:egpText(4, "3.0", vec2(450, 25))
+    SCREEN:egpText(4, "by NickMBR", vec2(115, 75))
     SCREEN:egpAlign(4, 1)
-    SCREEN:egpSize(4, 25)
+    SCREEN:egpSize(4, 30)
     SCREEN:egpFont(4, "Coolvetica")
     SCREEN:egpColor(4, COLORS["FOREGROUND", vector])
-    
-    SCREEN:egpText(5, "by NickMBR", vec2(115, 75))
-    SCREEN:egpAlign(5, 1)
-    SCREEN:egpSize(5, 30)
-    SCREEN:egpFont(5, "Coolvetica")
-    SCREEN:egpColor(5, COLORS["FOREGROUND", vector])
 }
 
 function void drawMainPage() {
@@ -95,6 +95,50 @@ function void drawMainPage() {
         clearScreen()
         drawPanel()
         drawHeader()
+        
+        local I = 5
+        
+        SCREEN:egpBox(I, vec2(0, 150), vec2(256, 80))
+        SCREEN:egpColor(I, COLORS["GREY1", vector])
+        I++
+        
+        SCREEN:egpBox(I, vec2(256, 150), vec2(256, 80))
+        SCREEN:egpColor(I, COLORS["GREY2", vector])
+        I++
+        
+        SCREEN:egpText(I, "Leaderboard", vec2(256, 130))
+        SCREEN:egpAlign(I, 1)
+        SCREEN:egpSize(I, 30)
+        SCREEN:egpFont(I, "Coolvetica")
+        SCREEN:egpColor(I, COLORS["FOREGROUND", vector])
+        I++
+        
+        SCREEN:egpText(I, "1234567890", vec2(128, 165))
+        SCREEN:egpAlign(I, 1)
+        SCREEN:egpSize(I, 50)
+        SCREEN:egpFont(I, "Coolvetica")
+        SCREEN:egpColor(I, COLORS["ACCENT", vector])
+        I++
+        
+        SCREEN:egpText(I, "Ranger", vec2(128, 215))
+        SCREEN:egpAlign(I, 1)
+        SCREEN:egpSize(I, 30)
+        SCREEN:egpFont(I, "Coolvetica")
+        SCREEN:egpColor(I, COLORS["FOREGROUND", vector])
+        I++
+        
+        SCREEN:egpText(I, "1234567890", vec2(256 + 128, 165))
+        SCREEN:egpAlign(I, 1)
+        SCREEN:egpSize(I, 50)
+        SCREEN:egpFont(I, "Coolvetica")
+        SCREEN:egpColor(I, COLORS["ACCENT", vector])
+        I++
+        
+        SCREEN:egpText(I, "Assault", vec2(256 + 128, 215))
+        SCREEN:egpAlign(I, 1)
+        SCREEN:egpSize(I, 30)
+        SCREEN:egpFont(I, "Coolvetica")
+        SCREEN:egpColor(I, COLORS["FOREGROUND", vector])
     }
 }
 
