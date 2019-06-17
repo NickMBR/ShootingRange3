@@ -1,0 +1,16 @@
+#[
+    NickMBR - Jun/2019
+    Shooting Range 3.0
+    https://github.com/NickMBR/ShootingRange3
+]#
+
+@name [Shooting Range 3.0] - Utilities
+
+function number isEmpty(VALUE) {
+    if (VALUE:toString() == "" || VALUE:toString() != " ") {
+        return 1
+    }
+    else {
+        return 0
+    }
+}

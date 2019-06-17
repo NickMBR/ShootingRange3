@@ -8,24 +8,32 @@
 
 # MAIN I/O
 @inputs SCREEN:wirelink USER:entity
-@persist CURSOR:vector2 [PAGE, MODE]:string SCREEN_USER:entity COLORS:table CLEAR_SCREEN:number
+@persist [CURSOR, POSA, POSB]:vector2 [PAGE, MODE, ACTION]:string SCREEN_USER:entity [COLORS, BUTTONS]:table CLEAR_SCREEN:number
+
+# GLOBALS
+@persist [GPLAYERS, GDATA]:gtable
 
 runOnTick(66)
 MODE = "DEVELOPMENT"
 
 if (first() | duped()) {
-    SCREEN_USER = noentity()
+    # IMPORTS
+    #include "shootingrange3/[shooting_range_3.0]_-_utilities"
+
+    # COLORS
     COLORS = table()
-    
     COLORS["BACKGROUND", vector] = vec(41)
     COLORS["FOREGROUND", vector] = vec(230)
-    COLORS["GREY1", vector] = vec(100)
-    COLORS["GREY2", vector] = vec(80)
+    COLORS["GREY1", vector] = vec(80)
+    COLORS["GREY2", vector] = vec(60)
     COLORS["PRIMARY", vector] = vec(161, 51, 34)
     COLORS["ACCENT", vector] = vec(0, 255, 127)
     
+    # SCREEN
+    SCREEN_USER = noentity()
     CLEAR_SCREEN = 1
     
+    # BOOT
     if (MODE == "DEVELOPMENT") {
         SCREEN:egpClear()
         SCREEN:egpDrawTopLeft(1)
@@ -33,6 +41,10 @@ if (first() | duped()) {
         PAGE = ""
         timer("BOOT", 500)
     }
+    
+    # GLOBAL TABLES
+    GPLAYERS = gTable("SR3_PLAYERS", 0)
+    GDATA = gTable("SR3_DATA", 0)
     
 }
 
@@ -63,6 +75,26 @@ function void clearScreen()
 {
     SCREEN:egpClear()
     CLEAR_SCREEN = 0
+}
+
+# CONTROL BUTTON PRESSES
+function number buttonPress(BID:number)
+{
+    POSA = SCREEN:egpPos(BID)
+    POSB = SCREEN:egpPos(BID) + SCREEN:egpSize(BID)
+    
+    if (SCREEN_USER:keyUse() && inrange(CURSOR, POSA, POSB)) {
+        SCREEN:egpColor(BID, COLORS["GREY1", vector])
+        return 1
+    }
+    elseif (inrange(CURSOR, POSA, POSB)) {
+        SCREEN:egpColor(BID, COLORS["PRIMARY", vector] + vec(50))
+    }
+    else {
+        SCREEN:egpColor(BID, COLORS["PRIMARY", vector])
+    }
+
+    return 0
 }
 
 function void drawPanel() {
@@ -98,12 +130,8 @@ function void drawMainPage() {
         
         local I = 5
         
-        SCREEN:egpBox(I, vec2(0, 150), vec2(256, 80))
-        SCREEN:egpColor(I, COLORS["GREY1", vector])
-        I++
-        
-        SCREEN:egpBox(I, vec2(256, 150), vec2(256, 80))
-        SCREEN:egpColor(I, COLORS["GREY2", vector])
+        SCREEN:egpBox(I, vec2(0, 155), vec2(512, 2))
+        SCREEN:egpColor(I, COLORS["FOREGROUND", vector])
         I++
         
         SCREEN:egpText(I, "Leaderboard", vec2(256, 130))
@@ -113,33 +141,89 @@ function void drawMainPage() {
         SCREEN:egpColor(I, COLORS["FOREGROUND", vector])
         I++
         
-        SCREEN:egpText(I, "1234567890", vec2(128, 165))
+        local RANGER_TOPSCORE = GDATA["RANGER_TOPSCORE", number]
+        SCREEN:egpText(I, isEmpty(RANGER_TOPSCORE) ? "N/A" : RANGER_TOPSCORE:toString(), vec2(128, 165))
         SCREEN:egpAlign(I, 1)
         SCREEN:egpSize(I, 50)
         SCREEN:egpFont(I, "Coolvetica")
         SCREEN:egpColor(I, COLORS["ACCENT", vector])
         I++
         
-        SCREEN:egpText(I, "Ranger", vec2(128, 215))
+        SCREEN:egpText(I, "Ranger", vec2(128, 205))
         SCREEN:egpAlign(I, 1)
         SCREEN:egpSize(I, 30)
         SCREEN:egpFont(I, "Coolvetica")
         SCREEN:egpColor(I, COLORS["FOREGROUND", vector])
         I++
         
-        SCREEN:egpText(I, "1234567890", vec2(256 + 128, 165))
+        local ASSAULT_TOPSCORE = GDATA["ASSAULT_TOPSCORE", number]
+        SCREEN:egpText(I, isEmpty(ASSAULT_TOPSCORE) ? "N/A" : ASSAULT_TOPSCORE:toString(), vec2(256 + 128, 165))
         SCREEN:egpAlign(I, 1)
         SCREEN:egpSize(I, 50)
         SCREEN:egpFont(I, "Coolvetica")
         SCREEN:egpColor(I, COLORS["ACCENT", vector])
         I++
         
-        SCREEN:egpText(I, "Assault", vec2(256 + 128, 215))
+        SCREEN:egpText(I, "Assault", vec2(256 + 128, 205))
         SCREEN:egpAlign(I, 1)
         SCREEN:egpSize(I, 30)
         SCREEN:egpFont(I, "Coolvetica")
         SCREEN:egpColor(I, COLORS["FOREGROUND", vector])
+        I++
+        
+        SCREEN:egpBox(I, vec2(0, 280), vec2(512, 2))
+        SCREEN:egpColor(I, COLORS["FOREGROUND", vector])
+        I++
+        
+        SCREEN:egpText(I, "Menu", vec2(256, 255))
+        SCREEN:egpAlign(I, 1)
+        SCREEN:egpSize(I, 30)
+        SCREEN:egpFont(I, "Coolvetica")
+        SCREEN:egpColor(I, COLORS["FOREGROUND", vector])
+        I++
+        
+        # PLAY BUTTON
+        SCREEN:egpBox(I, vec2(256 - (320/2), 295), vec2(320, 60))
+        SCREEN:egpColor(I, COLORS["PRIMARY", vector])
+        I++
+        
+        SCREEN:egpText(I, "Play", vec2(256, 303))
+        SCREEN:egpAlign(I, 1)
+        SCREEN:egpSize(I, 50)
+        SCREEN:egpFont(I, "Coolvetica")
+        SCREEN:egpColor(I, COLORS["FOREGROUND", vector])
+        I++
+        
+        # SETTINGS BUTTON
+        SCREEN:egpBox(I, vec2(256 - (320/2), 360), vec2(320, 60))
+        SCREEN:egpColor(I, COLORS["PRIMARY", vector])
+        I++
+        
+        SCREEN:egpText(I, "Settings", vec2(256, 303 + 65))
+        SCREEN:egpAlign(I, 1)
+        SCREEN:egpSize(I, 50)
+        SCREEN:egpFont(I, "Coolvetica")
+        SCREEN:egpColor(I, COLORS["FOREGROUND", vector])
+        I++
+        
+        # LEADERBOARDS BUTTON
+        SCREEN:egpBox(I, vec2(256 - (320/2), 425), vec2(320, 60))
+        SCREEN:egpColor(I, COLORS["PRIMARY", vector])
+        I++
+        
+        SCREEN:egpText(I, "Leaderboards", vec2(256, 303 + 65*2))
+        SCREEN:egpAlign(I, 1)
+        SCREEN:egpSize(I, 50)
+        SCREEN:egpFont(I, "Coolvetica")
+        SCREEN:egpColor(I, COLORS["FOREGROUND", vector])
+        I++
     }
+}
+
+if (PAGE == "MAIN") {
+    if (buttonPress(13)) { ACTION = "PLAY" }
+    if (buttonPress(15)) { ACTION = "SETTINGS" }
+    if (buttonPress(17)) { ACTION = "LEADERBOARDS" }
 }
 
 if (changed(PAGE)) {
@@ -147,6 +231,11 @@ if (changed(PAGE)) {
     
     if (PAGE == "MAIN") {
         SCREEN_USER = noentity()
+        print("SHOULD DRAW MAIN PAGE")
         drawMainPage()
     }
+}
+
+if (changed(ACTION)) {
+    print(ACTION)
 }
