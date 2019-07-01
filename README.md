@@ -8,6 +8,7 @@ As of now, Shooting Range 3.0 uses the following addons to work<br>
 * [Advanced Duplicator 2](https://github.com/wiremod/advdupe2)<br>
 * [SProps](https://steamcommunity.com/sharedfiles/filedetails/?id=173482196)<br>
 * [WTP Materials](https://steamcommunity.com/sharedfiles/filedetails/?id=256056339)<br>
+* [DamageCore](https://steamcommunity.com/sharedfiles/filedetails/?id=217370580)<br>
 
 ### Coming soon...
 
