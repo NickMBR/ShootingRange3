@@ -6,11 +6,25 @@
 
 @name [Shooting Range 3.0] - Utilities
 
-function number isEmpty(VALUE) {
-    if (VALUE:toString() == "" || VALUE:toString() != " ") {
+function number isEmpty(VAL) {
+    if (VAL:toString() == "" || VAL:toString() != " ") {
         return 1
     }
     else {
         return 0
+    }
+}
+
+function string concatPlayerName(VAL:string) {
+    if (VAL == "" || !VAL) {
+        return ""
+    }
+    else {
+        if (VAL:length() <= 20) {
+            return VAL
+        }
+        else {
+            return VAL:sub(1, 18) + ".."
+        }
     }
 }

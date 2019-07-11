@@ -1,0 +1,47 @@
+#[
+    NickMBR - Jun/2019
+    Shooting Range 3.0
+    https://github.com/NickMBR/ShootingRange3
+]#
+
+@name [Shooting Range 3.0] - AFK System
+
+# MAIN I/O
+@inputs [AFK_ACTIVE]:number
+@outputs [AFK_TIME_LEFT, AFK_KICK]:number
+@persist [AFK_TIME, AFK_KICK_TIME]:number
+
+if (first() || dupefinished()) {
+    AFK_KICK_TIME = 5
+    AFK_TIME = AFK_KICK_TIME
+    AFK_KICK = 0
+}
+
+if (changed(AFK_ACTIVE)) {
+    if (AFK_ACTIVE) {
+        AFK_TIME = AFK_KICK_TIME
+        timer("AFK", 1000)
+    }
+    else {
+        AFK_KICK = 0
+    }
+}
+
+if (clk("AFK")) {
+    if (AFK_TIME > 0 && AFK_ACTIVE) {
+        AFK_TIME--
+        timer("AFK", 1000)
+    }
+    elseif (AFK_TIME == 0 && AFK_ACTIVE) {
+        AFK_KICK = 1
+        AFK_TIME = 0
+        stoptimer("AFK")
+    }
+    else {
+        AFK_KICK = 0
+        AFK_TIME = 0
+        stoptimer("AFK")
+    }
+}
+
+AFK_TIME_LEFT = AFK_TIME
